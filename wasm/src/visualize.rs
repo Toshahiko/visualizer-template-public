@@ -1,6 +1,6 @@
 use crate::parse::{Direction, Input, Point};
 use crate::parse::Output;
-use svg::node::element::{Circle, Rectangle, Style};
+use svg::node::element::{Circle, Line, Rectangle, Style};
 use svg::node::Text;
 pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, String) {
 
@@ -57,7 +57,7 @@ pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, Stri
                     y * h,
                     w,
                     h,
-                    &generate_dark_color(100 + 100*turn),
+                    &generate_dark_color(10 + 5*turn), // 点数に応じて色を帰る。
                 )
                     .set("stroke", "gray")
                     .set("stroke-width", 1)
@@ -74,12 +74,34 @@ pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, Stri
         }
     }
 
+    for y in 0..input.n {
+        for x in 0..input.n {
+            if x == input.n - 1 {continue;}
+            if input.v[y][x] == 1 {
+                doc = doc.add(
+                    line( x*w +scale, y*h, x*w +scale, y*h + scale )
+                )
+            }
+        }
+    }
+
+    for y in 0..input.n {
+        if y == input.n - 1 {continue;}
+        for x in 0..input.n {
+            if input.h[y][x] == 1 {
+                doc = doc.add(
+                    line( x*w, y*h+scale, x*w + scale, y*h +scale )
+                )
+            }
+        }
+    }
+
     doc = doc.add(
-        circle( takahashi_history[turn].x*w + scale/2,takahashi_history[turn].y*h + scale/2, scale/2 )
+        circle( takahashi_history[turn].x*w + scale/2,takahashi_history[turn].y*h + scale/2, scale/2,"black" )
     );
 
     doc = doc.add(
-        circle(  aoki_history[turn].x*w + scale/2,aoki_history[turn].y*h + scale/2, scale/2 )
+        circle(  aoki_history[turn].x*w + scale/2,aoki_history[turn].y*h + scale/2, scale/2, "white" )
     );
 
     (100, "".to_string(), doc.to_string() )
@@ -120,6 +142,16 @@ pub fn rect(x: usize, y: usize, w: usize, h: usize, fill: &str) -> Rectangle {
         .set("fill", fill)
 }
 
+pub fn line(x1: usize, y1: usize, x2: usize, y2: usize) -> Line {
+    Line::new()
+        .set("x1", x1)
+        .set("y1", y1)
+        .set("x2", x2)
+        .set("y2", y2)
+        .set("stroke", "black")
+        .set("stroke-width", 3)
+}
+
 pub fn text(x: usize, y: usize, value: i32) -> svg::node::element::Text {
     let text_node =Text::new(value.to_string());
     svg::node::element::Text::new()
@@ -128,12 +160,12 @@ pub fn text(x: usize, y: usize, value: i32) -> svg::node::element::Text {
         .add(text_node)
 }
 
-pub fn circle( x: usize, y:usize, radius:usize) -> Circle{
+pub fn circle( x: usize, y:usize, radius:usize, stroke:&str) -> Circle{
     Circle::new()
         .set("cx", x)
         .set("cy", y)
         .set("r", radius)
-        .set("stroke", "black")
+        .set("stroke", stroke)
         .set("fill", "transparent")
         .set( "stroke-width", 2)
 }
