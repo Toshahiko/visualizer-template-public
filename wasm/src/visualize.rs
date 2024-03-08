@@ -57,7 +57,7 @@ pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, Stri
                     y * h,
                     w,
                     h,
-                    &generate_dark_color(10 + 5*turn), // 点数に応じて色を帰る。
+                    &generate_color(result_history[turn][y][x] as usize, input.n*input.n), // 点数に応じて色を帰る。
                 )
                     .set("stroke", "gray")
                     .set("stroke-width", 1)
@@ -201,9 +201,9 @@ fn generate_dark_color(code: usize) -> String {
     )
 }
 
-fn generate_color(code: usize) -> String {
+fn generate_color(code: usize, max_number: usize) -> String {
     // 入力値に基づいてHue（色相）を計算
-    let hue = (code as f32 * 36.0) % 360.0;
+    let hue = (code as f32 / max_number as f32) * 360.0 % 360.0;
 
     // Saturation（彩度）とLightness（明度）を固定値で設定
     let saturation = 10.0;
