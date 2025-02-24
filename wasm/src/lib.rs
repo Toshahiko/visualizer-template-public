@@ -38,8 +38,11 @@ pub struct Ret {
 #[wasm_bindgen]
 pub fn vis(_input: String, _output: String, turn: usize) -> Ret {
     let input = parser::parse_input( &_input ) ;
+    let input_data = converter::convert_input(&input);
+
     let output = parser::parse_output(&_output) ;
-    let( score, err, svg ) = visualize(input, output, turn) ;
+    let output_data = converter::convert_output(&input, output);
+    let( score, err, svg ) = visualize(input_data, output_data, turn) ;
 
     Ret {
         score,

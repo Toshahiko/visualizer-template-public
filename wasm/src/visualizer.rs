@@ -1,37 +1,21 @@
-use crate::parser::{Direction, Input, Point};
-use crate::parser::Output;
+use crate::parser::{Direction, Point};
 use svg::node::element::{Circle, Line, Rectangle, Style};
 use svg::node::Text;
-pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, String) {
 
-    let mut takahashi_history : Vec<Point> = vec![ output.takahashi_first ];
-    let mut aoki_history : Vec<Point> = vec![ output.aoki_first ];
-    for (_, dir1, dir2) in output.walks.iter() {
-        let before = takahashi_history.last().unwrap();
-        let next :Point  = next_position( before, dir1) ;
-        takahashi_history.push(next ) ;
+pub struct InputData {
+    pub t: usize,
+    pub n: usize,
+    pub v: Vec<Vec<i32>>,
+    pub h: Vec<Vec<i32>>,
+}
 
-        let before = aoki_history.last().unwrap();
-        let next :Point  = next_position( before, dir2) ;
-        aoki_history.push(next ) ;
-    }
+pub struct OutputData {
+    pub takahashi_history: Vec<Point>,
+    pub aoki_history: Vec<Point>,
+    pub result_history: Vec<Vec<Vec<i32>>>
+}
 
-    if output.walks.len() != takahashi_history.len() -1 || output.walks.len() != aoki_history.len() -1 {
-        panic!()
-    }
-
-    let mut aaa = input.a.clone();
-    let mut result_history = vec![input.a] ;
-    for i in 0..output.walks.len() {
-        if output.walks[i].0  {
-            aaa = update_board(aaa, takahashi_history[i], aoki_history[i]);
-        }
-        result_history.push( aaa.clone()) ;
-    }
-
-
-
-
+pub fn visualize(input: InputData, output: OutputData, turn: usize) ->(i64, String, String) {
 
     let scale = 30;
     let W = input.n*scale;
@@ -57,7 +41,7 @@ pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, Stri
                     y * h,
                     w,
                     h,
-                    &generate_color(result_history[turn][y][x] as usize, input.n*input.n), // 点数に応じて色を帰る。
+                    &generate_color(output.result_history[turn][y][x] as usize, input.n*input.n), // 点数に応じて色を帰る。
                 )
                     .set("stroke", "gray")
                     .set("stroke-width", 1)
@@ -69,7 +53,7 @@ pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, Stri
     for y in 0..input.n {
         for x in 0..input.n {
             doc = doc.add(
-                text( x*w + scale/2, y * h + scale/2, result_history[turn][y][x])
+                text( x*w + scale/2, y * h + scale/2, output.result_history[turn][y][x])
             )
         }
     }
@@ -97,11 +81,11 @@ pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, Stri
     }
 
     doc = doc.add(
-        circle( takahashi_history[turn].x*w + scale/2,takahashi_history[turn].y*h + scale/2, scale/2,"black" )
+        circle( output.takahashi_history[turn].x*w + scale/2,output.takahashi_history[turn].y*h + scale/2, scale/2,"black" )
     );
 
     doc = doc.add(
-        circle(  aoki_history[turn].x*w + scale/2,aoki_history[turn].y*h + scale/2, scale/2, "white" )
+        circle(  output.aoki_history[turn].x*w + scale/2,output.aoki_history[turn].y*h + scale/2, scale/2, "white" )
     );
 
     (100, "".to_string(), doc.to_string() )
