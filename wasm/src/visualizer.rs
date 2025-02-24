@@ -1,5 +1,5 @@
-use crate::parse::{Direction, Input, Point};
-use crate::parse::Output;
+use crate::parser::{Direction, Input, Point};
+use crate::parser::Output;
 use svg::node::element::{Circle, Line, Rectangle, Style};
 use svg::node::Text;
 pub fn visualize(input: Input, output: Output, turn: usize) ->(i64, String, String) {

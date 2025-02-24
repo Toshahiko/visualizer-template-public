@@ -2,14 +2,15 @@
 
 use std::fmt::Debug;
 use wasm_bindgen::prelude::*;
-use crate::visualize::visualize;
+use crate::visualizer::visualize;
 use itertools::Itertools;
 use proconio::{input, marker::Chars};
 use rand::prelude::*;
 use std::ops::RangeBounds;
 
-mod parse;
-mod visualize;
+mod parser;
+mod visualizer;
+mod converter;
 
 #[wasm_bindgen]
 pub fn gen(seed: i32) -> String {
@@ -36,8 +37,8 @@ pub struct Ret {
 
 #[wasm_bindgen]
 pub fn vis(_input: String, _output: String, turn: usize) -> Ret {
-    let input = parse::parse_input( &_input ) ;
-    let output = parse::parse_output(&_output) ;
+    let input = parser::parse_input( &_input ) ;
+    let output = parser::parse_output(&_output) ;
     let( score, err, svg ) = visualize(input, output, turn) ;
 
     Ret {
@@ -49,7 +50,7 @@ pub fn vis(_input: String, _output: String, turn: usize) -> Ret {
 
 #[wasm_bindgen]
 pub fn get_max_turn(_input: String, _output: String) -> usize {
-    parse::parse_output( &_output ).max_step
+    parser::parse_output( &_output ).max_step
 }
 
 pub trait SetMinMax {
